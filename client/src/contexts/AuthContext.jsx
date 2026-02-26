@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
+// Point all API calls to Render in production, localhost in dev
+if (import.meta.env.VITE_SERVER_URL) {
+  axios.defaults.baseURL = import.meta.env.VITE_SERVER_URL;
+}
+// Give Render's free tier time to wake up (it sleeps and takes ~30s on first request)
+axios.defaults.timeout = 30000;
+
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
