@@ -6,16 +6,10 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 
 const app = express();
-const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.CLIENT_URL,   // set this to your Vercel URL in Render env vars
-].filter(Boolean);
 
-app.use(cors({
-  origin: (origin, cb) => cb(null, allowedOrigins.includes(origin) || !origin),
-  credentials: true
-}));
-app.use(express.json({ limit: '10mb' })); // increased limit for base64 avatars
+// Accept requests from any origin (Vercel, localhost, etc.)
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json({ limit: '10mb' }));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
@@ -35,10 +29,10 @@ app.use('/api/messages', require('./routes/messages'));
 // Create HTTP server
 const server = http.createServer(app);
 
-// Socket.io
+// Socket.io — accept connections from any origin
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
   }
